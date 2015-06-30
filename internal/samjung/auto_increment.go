@@ -49,6 +49,10 @@ func (r *Samjung) getAutoIncrement() (uint64, error) {
 	}
 
 	number, err := strconv.ParseUint(string(numByte), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	
 	number = number + 1
 	_, err = f.WriteString(strconv.FormatUint(number, 10))
 	if err != nil {

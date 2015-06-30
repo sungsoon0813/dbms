@@ -51,6 +51,6 @@ func (r *Samjung) readIndexFromFile() error {
 		return err
 	}
 	
-	fmt.Printf("%v", r.indexMap)
+	fmt.Printf("%v\n", r.indexMap)
 	return nil
 }

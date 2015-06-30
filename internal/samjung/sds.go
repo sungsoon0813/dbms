@@ -71,7 +71,7 @@ func (r *Samjung) Start() {
 
 		switch c {
 		default:
-			fmt.Printf("Invalid value..")
+			fmt.Printf("Invalid value..\n")
 		case '1':
 			err = r.insertRow()
 		case '2':
