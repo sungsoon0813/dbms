@@ -3,9 +3,9 @@ package samjung
 import (
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"os"
 	"syscall"
+	"fmt"
 )
 
 // TODO : 픽스 시키지 않고 컬럼 이름으로 구분하여 컬럼 타입에 따라 insert할 수 있도록 변경
@@ -21,15 +21,25 @@ func (r *Samjung) insertRow() error {
 	if err != nil {
 		return err
 	}
-
-	rowData, err := r.makePutArgs(name, position)
+	
+	pk, err := r.getAutoIncrement()
 	if err != nil {
 		return err
 	}
 
-	err = r.writeToDataFile(rowData)
+	rowData, err := r.makePutArgs(pk, name, position)
 	if err != nil {
 		return err
+	}
+
+	offset, err := r.writeDataToFile(rowData)
+	if err != nil {
+		return err
+	}
+	
+	err = r.makeIndex(pk, offset)
+	if err != nil {
+		return nil
 	}
 
 	return nil
@@ -42,18 +52,7 @@ func (r *Samjung) makePutArgs(args ...interface{}) ([]byte, error) {
 	}
 
 	buf := make([]byte, 0)
-
-	// primary key auto_increment 값 추가
-	pk, err := r.getAutoIncrement()
-	if err != nil {
-		fmt.Printf("err = %v", err)
-		return nil, err
-	}
-	pkBuf := make([]byte, 8)
-	binary.BigEndian.PutUint64(pkBuf, pk)
-	buf = append(buf, pkBuf...)
-
-	// 이외의 컬럼 추가
+	// 컬럼 추가
 	for _, v := range args {
 		if v == nil {
 			continue
@@ -81,32 +80,32 @@ func (r *Samjung) makePutArgs(args ...interface{}) ([]byte, error) {
 	return buf, nil
 }
 
-func (r *Samjung) writeToDataFile(rowData []byte) error {
+func (r *Samjung) writeDataToFile(rowData []byte) (uint64, error) {
 	// open file
 	f, err := os.OpenFile(r.baseDir+"/"+tableFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0664)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer f.Close()
 
 	// file lock
 	err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer syscall.Flock(int(f.Fd()), syscall.LOCK_UN)
 
 	// seek end offset of file
 	offset, err := f.Seek(0, os.SEEK_END)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// write to file
 	_, err = f.WriteAt(rowData, offset)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return uint64(offset), nil
 }

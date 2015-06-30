@@ -13,21 +13,21 @@ import (
 // – 특정 데이터를 파일에서 검색해서 출력
 // – 데이터 파일 인덱싱 (인덱스도 파일로 저장)
 //
-//추가 기능 (구현시 각각 가산점 부여!)
-//– Delete & Update
-//– Transaction Log (Redo & Undo)
-//– Query cache
-//– Remote client
-//– Etc.
+// 추가 기능 (구현시 각각 가산점 부여!)
+// – Delete & Update
+// – Transaction Log (Redo & Undo)
+// – Query cache
+// – Remote client
+// – Etc.
 
-//만들어진 파일의 첫줄은 컬럼 이름 - 타입을 쌍으로 가지고 있도록 하고 메모리에 순서쌍으로 가지고 있음
-//insert 하기 전에 파일 lock 걸고 파일 고치고 flush() 뒤에 lock 해제
-//int는 4바이트 고정 , string은 variable length로 길이 체크하고 읽는방법으로 구현.
-//검색을 할때는 무조건 primary key를 기준으로 그 row를 전체 다 가지고와서 순서쌍을 비교해서 보여주는 방식으로 함
-//인덱스는 어떻게 구현할까 -> map 을 그대로 파일로 써놓고 다시 켜졌을때 다시 불러오는 방법으로 구현
+// 어떻게 구현할까...
+// 만들어진 파일의 첫줄은 컬럼 이름 - 타입을 쌍으로 가지고 있도록 하고 메모리에 순서쌍으로 가지고 있음
+// insert 하기 전에 파일 lock 걸고 파일 고치고 flush() 뒤에 lock 해제
+// int는 4바이트 고정 , string은 variable length로 길이 체크하고 읽는방법으로 구현.
+// 검색을 할때는 무조건 primary key를 기준으로 그 row를 전체 다 가지고와서 순서쌍을 비교해서 보여주는 방식으로 함
+// 인덱스는 어떻게 구현할까 -> map 을 그대로 파일로 써놓고 다시 켜졌을때 다시 불러오는 방법으로 구현
 
 func main() {
-
 	// 설정 파일에서 data_dir을 읽어와서 작업
 	c := config.New()
 	if err := c.Read(); err != nil {

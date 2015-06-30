@@ -14,10 +14,14 @@ const (
 
 type Samjung struct {
 	baseDir string
+	indexMap map[uint64]uint64 // pk, offset
 }
 
 func New(baseDir string) *Samjung {
-	return &Samjung{baseDir}
+	return &Samjung{
+		baseDir: baseDir,
+		indexMap: make(map[uint64]uint64),
+	}
 }
 
 func isExistFiles(baseDir string) error {
@@ -47,6 +51,13 @@ func (r *Samjung) Start() {
 		fmt.Printf("%v", err)
 		return
 	}
+	
+	// 메모리에 인덱스 로딩
+	err = r.readIndexFromFile()
+	if err != nil {
+		fmt.Printf("%v", err)
+		return
+	}
 
 	// TODO : 파일이 없으면 테이블을 새로 만드는 과정을 거친 후에 작업이 시작되도록 구현
 
@@ -62,11 +73,15 @@ func (r *Samjung) Start() {
 		default:
 			fmt.Printf("Invalid value..")
 		case '1':
-			r.insertRow()
+			err = r.insertRow()
 		case '2':
-			r.selectRow()
+			err = r.selectRow()
 		case '3':
 			return
+		}
+		
+		if err != nil {
+			fmt.Printf("err = %v", err)
 		}
 	}
 }
