@@ -1,8 +1,6 @@
 package query
 
-import (
-
-)
+import ()
 
 func putString() {
 

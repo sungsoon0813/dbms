@@ -12,7 +12,7 @@ var (
 )
 
 type Config struct {
-	BaseDir         string
+	BaseDir string
 }
 
 func New() *Config {
