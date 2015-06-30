@@ -38,6 +38,11 @@ func (r *Samjung) writeIndexToFile() error {
 }
 
 func (r *Samjung) readIndexFromFile() error {
+	// 없으면 통과
+	if _, err := os.Stat(r.baseDir+"/"+indexFile); os.IsNotExist(err) {
+		return nil
+	}
+	
 	f, err := os.Open(r.baseDir+"/"+indexFile)
 	if err != nil {
 		return err

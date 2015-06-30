@@ -26,6 +26,7 @@ import (
 // int는 4바이트 고정 , string은 variable length로 길이 체크하고 읽는방법으로 구현.
 // 검색을 할때는 무조건 primary key를 기준으로 그 row를 전체 다 가지고와서 순서쌍을 비교해서 보여주는 방식으로 함
 // 인덱스는 어떻게 구현할까 -> map 을 그대로 파일로 써놓고 다시 켜졌을때 다시 불러오는 방법으로 구현
+// primary key는 auto_increment로 구현한 후에 secondary index는 primary key를 가리키도록 구현
 
 func main() {
 	// 설정 파일에서 data_dir을 읽어와서 작업

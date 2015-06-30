@@ -15,12 +15,14 @@ func (r *Samjung) insertRow() error {
 	if err != nil {
 		return err
 	}
-
+	name = name[:len(name)-1]
+	
 	fmt.Print("position: ")
 	position, err := r.readLine()
 	if err != nil {
 		return err
 	}
+	position = position[:len(position)-1]
 	
 	pk, err := r.getAutoIncrement()
 	if err != nil {

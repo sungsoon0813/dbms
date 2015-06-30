@@ -34,10 +34,6 @@ func (r *Samjung) selectRow() error {
 	return nil
 }
 
-func (r *Samjung) selectAll() {
-
-}
-
 func (r *Samjung) selectOne(pk uint64) error {
 	v, ok := r.indexMap[pk]
 	if ok == false {
@@ -45,26 +41,24 @@ func (r *Samjung) selectOne(pk uint64) error {
 		return nil
 	}
 	
-	col, err := r.readRow(int64(v))
+	f, err := os.Open(r.baseDir+"/"+tableFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	
+	col, err := r.readRow(f, int64(v), false)
 	if err != nil {
 		return err
 	}
 	
-	fmt.Printf("ID : %v\n", col.pk)
-	fmt.Printf("Name : %v", col.name)
-	fmt.Printf("Position : %v", col.position)
+	fmt.Printf("ID : %v, Name : %v, Position : %v\n", col.pk, col.name, col.position)
 	return nil
 }
 
-func (r *Samjung) readRow(offset int64) (column, error) {
-	f, err := os.Open(r.baseDir+"/"+tableFile)
-	if err != nil {
-		return column{}, err
-	}
-	defer f.Close()
-	
+func (r *Samjung) readRow(f *os.File, offset int64, recursive bool) (column, error) {
 	// pk 위치
-	_, err = f.Seek(offset, 0)
+	_, err := f.Seek(offset, 0)
 	if err != nil {
 		return column{}, err
 	}
@@ -135,5 +129,6 @@ func (r *Samjung) readRow(offset int64) (column, error) {
 	}
 	position := string(positionBuf)
 	
+	offset = offset + int64(positionLen)
 	return column{pk, name, position}, nil
 }
